@@ -1,88 +1,68 @@
 package com.example.sprs.controller;
 
+import com.example.sprs.dto.AuthResponse;
+import com.example.sprs.dto.LoginRequest;
+import com.example.sprs.dto.RegisterRequest;
+import com.example.sprs.model.User;
+import com.example.sprs.service.JwtService;
+import com.example.sprs.service.PasswordService;
 import com.example.sprs.service.UserService;
-import com.example.sprs.util.JwtUtil;
-import com.example.sprs.config.PasswordService;
-
-
-import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
 public class AuthController {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
-
-    private final UserService userService;
-    private final JwtUtil jwtUtil;
-    private final PasswordService passwordService;
+    @Autowired
+    private UserService userService;
 
     @Autowired
-    public AuthController(UserService userService, JwtUtil jwtUtil, PasswordService passwordService) {
-        this.userService = userService;
-        this.jwtUtil = jwtUtil;
-        this.passwordService = passwordService;
+    private PasswordService passwordService;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        try {
+            User user = userService.registerUser(registerRequest);
+
+
+            // Remove password from response
+            user.setPassword(null);
+
+            return ResponseEntity.ok(( user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest req) {
-        log.debug("Login attempt for username: {}", req.getUsername());
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+        try {
+            User user = userService.findByUsername(loginRequest.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return userService.getByUsername(req.getUsername())
-                .map(user -> {
-                    if (passwordService.matches(req.getPassword(), user.getPassword())) {
-                        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
-                        log.info("✅ Login successful for user: {}", user.getUsername());
-                        return ResponseEntity.ok(new AuthResponse(token, user.getRole()));
-                    } else {
-                        log.warn("❌ Incorrect password for user: {}", user.getUsername());
-                        return ResponseEntity.status(401)
-                                .body(new AuthResponse("Invalid username or password"));
-                    }
-                })
-                .orElseGet(() -> {
-                    log.warn("❌ Login failed - user '{}' not found", req.getUsername());
-                    return ResponseEntity.status(401)
-                            .body(new AuthResponse("Invalid username or password"));
-                });
-    }
+            if (!passwordService.matches(loginRequest.getPassword(), user.getPassword())) {
+                return ResponseEntity.badRequest().body("Invalid credentials");
+            }
 
-    // --- DTOs (Inner Classes) ---
+            if (!user.getRole().equals(loginRequest.getRole())) {
+                return ResponseEntity.badRequest().body("Invalid role");
+            }
 
-    @Data
-    public static class AuthRequest {
-        private String username;
-        private String password;
-    }
+            String token = jwtService.generateToken(user.getUsername());
 
-    public static class AuthResponse {
-        private final String token;
-        private final String role;
+            // Remove password from response
+            user.setPassword(null);
 
-        public AuthResponse(String token, String role) {
-            this.token = token;
-            this.role = role;
-        }
-
-        // Constructor for error case
-        public AuthResponse(String errorMessage) {
-            this.token = null;
-            this.role = errorMessage;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public String getRole() {
-            return role;
+            return ResponseEntity.ok(new AuthResponse(token, user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Login failed: " + e.getMessage());
         }
     }
 }

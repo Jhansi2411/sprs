@@ -3,84 +3,196 @@ package com.example.sprs.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Document(collection = "requests")
+@Document(collection = "permission_requests")
 public class PermissionRequest {
-
     @Id
     private String id;
 
-    // 🧑 Student Info
-    private String studentId;    // Optional: link to User._id
-    private String studentName;
+    @NotBlank(message = "Name is required")
+    private String name;
+
+    @NotBlank(message = "Roll number is required")
     private String rollNo;
+
+    @NotBlank(message = "Branch is required")
     private String branch;
+
+    @NotBlank(message = "Section is required")
     private String section;
 
-    // 📄 Request Info
-    private RequestType type;    // OUTPASS, EVENT, FEE, OTHER
+    @NotBlank(message = "Reason is required")
     private String reason;
+
+    @NotBlank(message = "Date is required")
     private String date;
+
+    @NotBlank(message = "Time is required")
     private String time;
-    private String letterContent;
 
-    // 🚦 Status Info
-    private RequestStatus status;  // DRAFT, SUBMITTED, APPROVED, REJECTED
+    @NotNull(message = "Type is required")
+    private RequestType type;
 
+    @NotNull(message = "Status is required")
+    private RequestStatus status = RequestStatus.DRAFT;
+
+    private String userId;
+    private String generatedLetter;
+    private LocalDateTime submittedAt;
+    private LocalDateTime reviewedAt;
+    private String reviewedBy;
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // ——— Enums ———
     public enum RequestType {
-        OUTPASS, EVENT, FEE, OTHER
+        OUTPASS, EVENTS, FEE, OTHERS
     }
 
     public enum RequestStatus {
         DRAFT, SUBMITTED, APPROVED, REJECTED
     }
 
-    // ——— Getters and Setters ———
+    // Constructors
+    public PermissionRequest() {}
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    // Getters and Setters
+    public String getId() {
+        return id;
+    }
 
-    public String getStudentId() { return studentId; }
-    public void setStudentId(String studentId) { this.studentId = studentId; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getStudentName() { return studentName; }
-    public void setStudentName(String studentName) { this.studentName = studentName; }
+    public String getName() {
+        return name;
+    }
 
-    public String getRollNo() { return rollNo; }
-    public void setRollNo(String rollNo) { this.rollNo = rollNo; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getBranch() { return branch; }
-    public void setBranch(String branch) { this.branch = branch; }
+    public String getRollNo() {
+        return rollNo;
+    }
 
-    public String getSection() { return section; }
-    public void setSection(String section) { this.section = section; }
+    public void setRollNo(String rollNo) {
+        this.rollNo = rollNo;
+    }
 
-    public RequestType getType() { return type; }
-    public void setType(RequestType type) { this.type = type; }
+    public String getBranch() {
+        return branch;
+    }
 
-    public String getReason() { return reason; }
-    public void setReason(String reason) { this.reason = reason; }
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
 
-    public String getDate() { return date; }
-    public void setDate(String date) { this.date = date; }
+    public String getSection() {
+        return section;
+    }
 
-    public String getTime() { return time; }
-    public void setTime(String time) { this.time = time; }
+    public void setSection(String section) {
+        this.section = section;
+    }
 
-    public String getLetterContent() { return letterContent; }
-    public void setLetterContent(String letterContent) { this.letterContent = letterContent; }
+    public String getReason() {
+        return reason;
+    }
 
-    public RequestStatus getStatus() { return status; }
-    public void setStatus(RequestStatus status) { this.status = status; }
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getDate() {
+        return date;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public RequestType getType() {
+        return type;
+    }
+
+    public void setType(RequestType type) {
+        this.type = type;
+    }
+
+    public RequestStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RequestStatus status) {
+        this.status = status;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getGeneratedLetter() {
+        return generatedLetter;
+    }
+
+    public void setGeneratedLetter(String generatedLetter) {
+        this.generatedLetter = generatedLetter;
+    }
+
+    public LocalDateTime getSubmittedAt() {
+        return submittedAt;
+    }
+
+    public void setSubmittedAt(LocalDateTime submittedAt) {
+        this.submittedAt = submittedAt;
+    }
+
+    public LocalDateTime getReviewedAt() {
+        return reviewedAt;
+    }
+
+    public void setReviewedAt(LocalDateTime reviewedAt) {
+        this.reviewedAt = reviewedAt;
+    }
+
+    public String getReviewedBy() {
+        return reviewedBy;
+    }
+
+    public void setReviewedBy(String reviewedBy) {
+        this.reviewedBy = reviewedBy;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

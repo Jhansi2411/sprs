@@ -1,37 +1,25 @@
-package com.example.sprs.model;
+package com.example.sprs.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.index.Indexed;
-
+import com.example.sprs.model.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-@Document(collection = "users")
-public class User {
-    @Id
-    private String id;
-
+public class RegisterRequest {
     @NotBlank(message = "Username is required")
-    @Indexed(unique = true)
     private String username;
 
     @NotBlank(message = "Password is required")
     private String password;
 
     @NotNull(message = "Role is required")
-    private Role role;
+    private User.Role role;
 
     private String name;
 
-    public enum Role {
-        STUDENT, EMPLOYEE
-    }
-
     // Constructors
-    public User() {}
+    public RegisterRequest() {}
 
-    public User(String username, String password, Role role, String name) {
+    public RegisterRequest(String username, String password, User.Role role, String name) {
         this.username = username;
         this.password = password;
         this.role = role;
@@ -39,14 +27,6 @@ public class User {
     }
 
     // Getters and Setters
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -63,11 +43,11 @@ public class User {
         this.password = password;
     }
 
-    public Role getRole() {
+    public User.Role getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(User.Role role) {
         this.role = role;
     }
 
