@@ -3,79 +3,120 @@ package com.example.sprs.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 
 @Document(collection = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     private String id;
 
-    @NotBlank(message = "Username is required")
     @Indexed(unique = true)
     private String username;
 
-    @NotBlank(message = "Password is required")
     private String password;
 
-    @NotNull(message = "Role is required")
     private Role role;
 
-    private String name;
+    private Profile profile;
 
-    public enum Role {
-        STUDENT, EMPLOYEE
-    }
+    private boolean isActive = true;
 
-    // Constructors
+    private LocalDateTime lastLogin;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
     public User() {}
 
-    public User(String username, String password, Role role, String name) {
+    public User(String username, String password, Role role, Profile profile) {
         this.username = username;
         this.password = password;
         this.role = role;
-        this.name = name;
+        this.profile = profile;
     }
 
-    // Getters and Setters
-    public String getId() {
-        return id;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
-    public void setId(String id) {
-        this.id = id;
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return isActive; }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+
+    public Profile getProfile() { return profile; }
+    public void setProfile(Profile profile) { this.profile = profile; }
+
+    public boolean isActive() { return isActive; }
+    public void setActive(boolean active) { isActive = active; }
+
+    public LocalDateTime getLastLogin() { return lastLogin; }
+    public void setLastLogin(LocalDateTime lastLogin) { this.lastLogin = lastLogin; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public enum Role {
+        STUDENT, EMPLOYEE, ADMIN
     }
 
-    public String getUsername() {
-        return username;
-    }
+    public static class Profile {
+        private String name;
+        private String email;
+        private String contact;
+        private String rollNo;
+        private String branch;
+        private String section;
+        private String department;
+        private String designation;
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+        public Profile() {}
 
-    public String getPassword() {
-        return password;
-    }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
 
-    public Role getRole() {
-        return role;
-    }
+        public String getContact() { return contact; }
+        public void setContact(String contact) { this.contact = contact; }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
+        public String getRollNo() { return rollNo; }
+        public void setRollNo(String rollNo) { this.rollNo = rollNo; }
 
-    public String getName() {
-        return name;
-    }
+        public String getBranch() { return branch; }
+        public void setBranch(String branch) { this.branch = branch; }
 
-    public void setName(String name) {
-        this.name = name;
+        public String getSection() { return section; }
+        public void setSection(String section) { this.section = section; }
+
+        public String getDepartment() { return department; }
+        public void setDepartment(String department) { this.department = department; }
+
+        public String getDesignation() { return designation; }
+        public void setDesignation(String designation) { this.designation = designation; }
     }
 }

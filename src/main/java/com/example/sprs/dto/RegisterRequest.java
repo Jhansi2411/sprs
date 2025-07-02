@@ -1,8 +1,10 @@
 package com.example.sprs.dto;
 
 import com.example.sprs.model.User;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 
 public class RegisterRequest {
     @NotBlank(message = "Username is required")
@@ -14,48 +16,22 @@ public class RegisterRequest {
     @NotNull(message = "Role is required")
     private User.Role role;
 
-    private String name;
+    @NotNull(message = "Profile is required")
+    private User.Profile profile;
 
     // Constructors
     public RegisterRequest() {}
 
-    public RegisterRequest(String username, String password, User.Role role, String name) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
-        this.name = name;
-    }
+    // Getters and setters
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    // Getters and Setters
-    public String getUsername() {
-        return username;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public User.Role getRole() { return role; }
+    public void setRole(User.Role role) { this.role = role; }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public User.Role getRole() {
-        return role;
-    }
-
-    public void setRole(User.Role role) {
-        this.role = role;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    public User.Profile getProfile() { return profile; }
+    public void setProfile(User.Profile profile) { this.profile = profile; }
 }
